@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>دردشة بالإيدي</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial;
+  background:#87CEEB;
+  height:100vh;
+}
+
+/* التطبيق */
+.app{
+  width:100%;
+  height:100vh;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+}
+
+.hidden{display:none}
+
+header{
+  background:#4CAF50;
+  color:#fff;
+  padding:10px;
+  text-align:center;
+  font-size:15px;
+}
+
+/* المحتوى */
+.main{
+  flex:1;
+  display:flex;
+  min-height:0;
+}
+
+/* قائمة المحادثات */
+.friends{
+  width:30%;
+  max-width:200px;
+  border-right:1px solid #ccc;
+  overflow-y:auto;
+}
+
+.friend{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  cursor:pointer;
+}
+.friend:hover{background:#f1f1f1}
+
+/* الدردشة */
+.chat{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+/* ✅ سجل المحادثات أكبر */
+.messages{
+  flex:1;
+  padding:12px;
+  overflow-y:auto;
+  background:#f9f9f9;
+}
+
+.me{
+  text-align:right;
+  margin:6px 0;
+}
+.other{
+  text-align:left;
+  color:#0a7a0a;
+  margin:6px 0;
+}
+
+/* ✅ مكان الكتابة أصغر */
+.input-box{
+  display:flex;
+  gap:6px;
+  padding:6px;
+  border-top:1px solid #ccc;
+}
+
+.input-box input{
+  flex:1;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+
+.input-box button{
+  padding:8px 14px;
+  border:none;
+  border-radius:6px;
+  background:#4CAF50;
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+}
+
+/* ✅ إضافة صديق أصغر */
+.add{
+  padding:6px;
+  border-top:1px solid #ccc;
+}
+
+.add input{
+  width:100%;
+  margin-top:4px;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:13px;
+}
+
+.add button{
+  width:100%;
+  margin-top:4px;
+  padding:8px;
+  border-radius:6px;
+  border:none;
+  background:#4CAF50;
+  color:#fff;
+  font-size:13px;
+}
+
+/* تسجيل الدخول */
+.login{
+  width:100%;
+  max-width:380px;
+  background:#fff;
+  margin:auto;
+  margin-top:20vh;
+  border-radius:10px;
+  padding:15px;
+}
+.login input,.login button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:6px;
+}
+.login button{
+  background:#4CAF50;
+  color:#fff;
+  border:none;
+}
+
+/* 📱 جوال */
+@media(max-width:600px){
+  .friends{width:35%}
+}
+</style>
+</head>
+
+<body>
+
+<!-- تسجيل الدخول -->
+<div class="login" id="loginBox">
+  <header>🔐 تسجيل الدخول</header>
+  <input id="username" placeholder="اسم المستخدم">
+  <input id="password" type="password" placeholder="كلمة المرور (6 أرقام)">
+  <button onclick="login()">دخول</button>
+</div>
+
+<!-- التطبيق -->
+<div class="app hidden" id="appBox">
+  <header>
+    💬 دردشة بالإيدي<br>
+    <small>إيديك: <b id="myIdText"></b></small>
+  </header>
+
+  <div class="main">
+    <div class="friends">
+      <div style="padding:8px;font-weight:bold">المحادثات</div>
+      <div id="friendsList"></div>
+    </div>
+
+    <div class="chat">
+      <div class="messages" id="messages"></div>
+
+      <div class="input-box">
+        <input id="msgInput" placeholder="اكتب رسالة">
+        <button onclick="sendMessage()">إرسال</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="add">
+    <input id="friendId" placeholder="إيدي صديق (8 أرقام)">
+    <input id="friendName" placeholder="اسم الصديق">
+    <button onclick="startChat()">بدء محادثة جديدة</button>
+  </div>
+</div>
+
+<script>
+let myId="";
+let chatKey="";
+
+function login(){
+  const u=username.value.trim();
+  const p=password.value.trim();
+
+  if(u.length<3) return alert("الاسم 3 أحرف على الأقل");
+  if(!/^\d{6,}$/.test(p)) return alert("كلمة المرور 6 أرقام أو أكثر");
+
+  const key="acc_"+u+"_"+p;
+  if(!localStorage.getItem(key)){
+    localStorage.setItem(key,Math.floor(10000000+Math.random()*90000000));
+  }
+
+  myId=localStorage.getItem(key);
+  myIdText.textContent=myId;
+
+  loginBox.classList.add("hidden");
+  appBox.classList.remove("hidden");
+  loadFriends();
+}
+
+function startChat(){
+  const id=friendId.value.trim();
+  const name=friendName.value.trim();
+  if(id.length!==8||!name) return;
+
+  let f=JSON.parse(localStorage.getItem("friends_"+myId)||"[]");
+  if(!f.find(x=>x.id===id)){
+    f.push({id,name});
+    localStorage.setItem("friends_"+myId,JSON.stringify(f));
+  }
+  openChat(id);
+  loadFriends();
+}
+
+function loadFriends(){
+  friendsList.innerHTML="";
+  const f=JSON.parse(localStorage.getItem("friends_"+myId)||"[]");
+  f.forEach(x=>{
+    const d=document.createElement("div");
+    d.className="friend";
+    d.textContent=x.name;
+    d.onclick=()=>openChat(x.id);
+    friendsList.appendChild(d);
+  });
+}
+
+function openChat(fid){
+  chatKey=[myId,fid].sort().join("_");
+  loadMessages();
+}
+
+function loadMessages(){
+  if(!chatKey) return;
+  const m=JSON.parse(localStorage.getItem(chatKey)||"[]");
+  messages.innerHTML="";
+  m.forEach(x=>{
+    const d=document.createElement("div");
+    d.className=x.sender===myId?"me":"other";
+    d.textContent=x.text;
+    messages.appendChild(d);
+  });
+  messages.scrollTop=messages.scrollHeight;
+}
+
+function sendMessage(){
+  if(!msgInput.value||!chatKey) return;
+  const m=JSON.parse(localStorage.getItem(chatKey)||"[]");
+  m.push({sender:myId,text:msgInput.value});
+  localStorage.setItem(chatKey,JSON.stringify(m));
+  msgInput.value="";
+  loadMessages();
+}
+
+setInterval(loadMessages,1000);
+</script>
+
+</body>
+</html>
