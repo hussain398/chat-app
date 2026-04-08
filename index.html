@@ -16,7 +16,6 @@ body{
   height:100vh;
 }
 
-/* التطبيق */
 .app{
   width:100%;
   height:100vh;
@@ -35,14 +34,12 @@ header{
   font-size:15px;
 }
 
-/* المحتوى */
 .main{
   flex:1;
   display:flex;
   min-height:0;
 }
 
-/* قائمة المحادثات */
 .friends{
   width:30%;
   max-width:200px;
@@ -57,7 +54,6 @@ header{
 }
 .friend:hover{background:#f1f1f1}
 
-/* الدردشة */
 .chat{
   flex:1;
   display:flex;
@@ -65,7 +61,6 @@ header{
   min-height:0;
 }
 
-/* ✅ سجل المحادثات أكبر */
 .messages{
   flex:1;
   padding:12px;
@@ -83,7 +78,6 @@ header{
   margin:6px 0;
 }
 
-/* ✅ مكان الكتابة أصغر */
 .input-box{
   display:flex;
   gap:6px;
@@ -109,7 +103,6 @@ header{
   cursor:pointer;
 }
 
-/* ✅ إضافة صديق أصغر */
 .add{
   padding:6px;
   border-top:1px solid #ccc;
@@ -135,7 +128,6 @@ header{
   font-size:13px;
 }
 
-/* تسجيل الدخول */
 .login{
   width:100%;
   max-width:380px;
@@ -157,7 +149,6 @@ header{
   border:none;
 }
 
-/* 📱 جوال */
 @media(max-width:600px){
   .friends{width:35%}
 }
@@ -166,15 +157,13 @@ header{
 
 <body>
 
-<!-- تسجيل الدخول -->
 <div class="login" id="loginBox">
   <header>🔐 تسجيل الدخول</header>
   <input id="username" placeholder="اسم المستخدم">
-  <input id="password" type="password" placeholder="كلمة المرور (6 أرقام)">
+  <input id="password" type="password" placeholder="كلمة المرور (حروف + أرقام)">
   <button onclick="login()">دخول</button>
 </div>
 
-<!-- التطبيق -->
 <div class="app hidden" id="appBox">
   <header>
     💬 دردشة بالإيدي<br>
@@ -209,19 +198,30 @@ let myId="";
 let chatKey="";
 
 function login(){
-  const u=username.value.trim();
-  const p=password.value.trim();
+  const u = username.value.trim();
+  const p = password.value.trim();
 
-  if(u.length<3) return alert("الاسم 3 أحرف على الأقل");
-  if(!/^\d{6,}$/.test(p)) return alert("كلمة المرور 6 أرقام أو أكثر");
-
-  const key="acc_"+u+"_"+p;
-  if(!localStorage.getItem(key)){
-    localStorage.setItem(key,Math.floor(10000000+Math.random()*90000000));
+  if(u.length < 3){
+    alert("اسم المستخدم 3 أحرف على الأقل");
+    return;
   }
 
-  myId=localStorage.getItem(key);
-  myIdText.textContent=myId;
+  if(p.length < 6){
+    alert("كلمة المرور يجب أن تكون 6 أحرف أو أكثر");
+    return;
+  }
+
+  const key = "acc_" + u + "_" + p;
+
+  if(!localStorage.getItem(key)){
+    localStorage.setItem(
+      key,
+      Math.floor(10000000 + Math.random() * 90000000)
+    );
+  }
+
+  myId = localStorage.getItem(key);
+  myIdText.textContent = myId;
 
   loginBox.classList.add("hidden");
   appBox.classList.remove("hidden");
@@ -229,59 +229,86 @@ function login(){
 }
 
 function startChat(){
-  const id=friendId.value.trim();
-  const name=friendName.value.trim();
-  if(id.length!==8||!name) return;
+  const id = friendId.value.trim();
+  const name = friendName.value.trim();
+  if(id.length !== 8 || !name) return;
 
-  let f=JSON.parse(localStorage.getItem("friends_"+myId)||"[]");
-  if(!f.find(x=>x.id===id)){
-    f.push({id,name});
-    localStorage.setItem("friends_"+myId,JSON.stringify(f));
+  let f = JSON.parse(localStorage.getItem("friends_" + myId) || "[]");
+  if(!f.find(x => x.id === id)){
+    f.push({id, name});
+    localStorage.setItem("friends_" + myId, JSON.stringify(f));
   }
   openChat(id);
   loadFriends();
 }
 
 function loadFriends(){
-  friendsList.innerHTML="";
-  const f=JSON.parse(localStorage.getItem("friends_"+myId)||"[]");
-  f.forEach(x=>{
-    const d=document.createElement("div");
-    d.className="friend";
-    d.textContent=x.name;
-    d.onclick=()=>openChat(x.id);
+  friendsList.innerHTML = "";
+  const f = JSON.parse(localStorage.getItem("friends_" + myId) || "[]");
+  f.forEach(x => {
+    const d = document.createElement("div");
+    d.className = "friend";
+    d.textContent = x.name;
+    d.onclick = () => openChat(x.id);
     friendsList.appendChild(d);
   });
 }
 
 function openChat(fid){
-  chatKey=[myId,fid].sort().join("_");
+  chatKey = [myId, fid].sort().join("_");
   loadMessages();
 }
 
 function loadMessages(){
   if(!chatKey) return;
-  const m=JSON.parse(localStorage.getItem(chatKey)||"[]");
-  messages.innerHTML="";
-  m.forEach(x=>{
-    const d=document.createElement("div");
-    d.className=x.sender===myId?"me":"other";
-    d.textContent=x.text;
+  const m = JSON.parse(localStorage.getItem(chatKey) || "[]");
+  messages.innerHTML = "";
+  m.forEach(x => {
+    const d = document.createElement("div");
+    d.className = x.sender === myId ? "me" : "other";
+    d.textContent = x.text;
     messages.appendChild(d);
   });
-  messages.scrollTop=messages.scrollHeight;
+  messages.scrollTop = messages.scrollHeight;
 }
 
 function sendMessage(){
-  if(!msgInput.value||!chatKey) return;
-  const m=JSON.parse(localStorage.getItem(chatKey)||"[]");
-  m.push({sender:myId,text:msgInput.value});
-  localStorage.setItem(chatKey,JSON.stringify(m));
-  msgInput.value="";
+  if(!msgInput.value || !chatKey) return;
+  const m = JSON.parse(localStorage.getItem(chatKey) || "[]");
+  m.push({sender: myId, text: msgInput.value});
+  localStorage.setItem(chatKey, JSON.stringify(m));
+  msgInput.value = "";
   loadMessages();
 }
+ // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getDatabase } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-setInterval(loadMessages,1000);
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyC71aDuiKtHDBvGSJXNOojQg-pUigaXm5M",
+    authDomain: "gdsg-533fc.firebaseapp.com",
+    databaseURL: "https://gdsg-533fc-default-rtdb.firebaseio.com",
+    projectId: "gdsg-533fc",
+    storageBucket: "gdsg-533fc.firebasestorage.app",
+    messagingSenderId: "298512385375",
+    appId: "1:298512385375:web:2b79a675a50cce6dd962ea"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+ const database = getDatabase(app);
+
+export { database };
+
+import { database } from "./config.js";
+import { ref,set } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+
+
+
+
+setInterval(loadMessages, 1000);
 </script>
 
 </body>
