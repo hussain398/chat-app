@@ -19,7 +19,8 @@ body {
     color: white;
     text-align: center;
     padding: 25px;
-    font-size: 26px;
+    font-size: 28px;
+    font-weight: bold;
 }
 
 /* الأقسام */
@@ -31,12 +32,18 @@ body {
 
 /* الأزرار */
 button {
-    padding: 12px;
-    margin: 5px;
+    padding: 14px;
+    margin: 8px 0;
     cursor: pointer;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 10px;
+    font-size: 18px;
+    width: 100%;
+    transition: 0.2s;
+}
+
+button:active {
+    transform: scale(0.98);
 }
 
 /* زر الرجوع */
@@ -48,22 +55,37 @@ button {
 /* الكروت */
 .card {
     background: white;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    font-size: 18px;
 }
 
-/* جعل الأزرار في الجوال عمودية */
+.card p {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+}
+
+/* تحسين الجوال */
 @media (max-width: 600px) {
-    button {
-        width: 100%;
+    .header {
+        font-size: 24px;
+        padding: 20px;
+    }
+
+    .section {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 22px;
         font-size: 18px;
     }
 
-    .header {
-        font-size: 22px;
-        padding: 20px;
+    button {
+        font-size: 19px;
+        padding: 16px;
     }
 }
 </style>
