@@ -1,103 +1,151 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>خدمات حسين</title>
+
 <style>
 body {
     font-family: Arial;
     margin: 0;
     background: #f5f5f5;
 }
+
+/* الهيدر */
 .header {
     background: #007BFF;
     color: white;
     text-align: center;
-    padding: 40px;
-    font-size: 30px;
+    padding: 25px;
+    font-size: 26px;
 }
+
+/* الأقسام */
 .section {
-    padding: 20px;
+    padding: 15px;
+    max-width: 900px;
+    margin: auto;
 }
+
+/* الأزرار */
 button {
-    padding: 10px;
+    padding: 12px;
     margin: 5px;
     cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
 }
+
+/* زر الرجوع */
+.back {
+    background: #444;
+    color: white;
+}
+
+/* الكروت */
 .card {
     background: white;
     padding: 15px;
     margin: 10px 0;
     border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-.back {
-    background: #555;
-    color: white;
+
+/* جعل الأزرار في الجوال عمودية */
+@media (max-width: 600px) {
+    button {
+        width: 100%;
+        font-size: 18px;
+    }
+
+    .header {
+        font-size: 22px;
+        padding: 20px;
+    }
 }
 </style>
 </head>
+
 <body>
 
 <div class="header">خدمات حسين</div>
 
+<!-- القائمة الرئيسية -->
 <div id="main" class="section">
     <h2>الأقسام</h2>
-    <button onclick="showSection('games')">خدمات الألعاب</button>
-    <button onclick="showSection('cars')">غسيل السيارات</button>
-    <button onclick="showSection('home')">تنظيف البيوت</button>
-    <button onclick="showSection('cart')">السلة</button>
+    <button onclick="showSection('games')">🎮 خدمات الألعاب</button>
+    <button onclick="showSection('cars')">🚗 غسيل السيارات</button>
+    <button onclick="showSection('home')">🏠 تنظيف البيوت</button>
+    <button onclick="showSection('cart')">🛒 السلة</button>
 </div>
 
+<!-- الألعاب -->
 <div id="games" class="section" style="display:none">
     <button class="back" onclick="showSection('main')">⬅ رجوع</button>
     <h3>براول ستار</h3>
+
     <div class="card">
         <p>رفع 1000 كأس - 1.5 دينار</p>
         <button onclick="addToCart('1000 كأس',1.5)">إضافة للسلة</button>
     </div>
+
     <div class="card">
         <p>رفع 2000 كأس - 2 دينار</p>
         <button onclick="addToCart('2000 كأس',2)">إضافة للسلة</button>
     </div>
+
     <div class="card">
         <p>رفع 3000 كأس - 2.5 دينار</p>
         <button onclick="addToCart('3000 كأس',2.5)">إضافة للسلة</button>
     </div>
 </div>
 
+<!-- السيارات -->
 <div id="cars" class="section" style="display:none">
     <button class="back" onclick="showSection('main')">⬅ رجوع</button>
+
     <div class="card">
         <p>سيارة صغيرة - 1.5 دينار</p>
         <button onclick="addToCart('سيارة صغيرة',1.5)">إضافة للسلة</button>
     </div>
+
     <div class="card">
         <p>سيارة كبيرة - 3 دينار</p>
         <button onclick="addToCart('سيارة كبيرة',3)">إضافة للسلة</button>
     </div>
 </div>
 
+<!-- تنظيف البيوت -->
 <div id="home" class="section" style="display:none">
     <button class="back" onclick="showSection('main')">⬅ رجوع</button>
+
     <div class="card">
         <p>تنظيف الطابق الأول - 1 دينار</p>
         <button onclick="addToCart('طابق أول',1)">إضافة للسلة</button>
     </div>
+
     <div class="card">
         <p>تنظيف الطابق الثاني - 1 دينار</p>
         <button onclick="addToCart('طابق ثاني',1)">إضافة للسلة</button>
     </div>
+
     <div class="card">
         <p>تنظيف الطابق الثالث - 1 دينار</p>
         <button onclick="addToCart('طابق ثالث',1)">إضافة للسلة</button>
     </div>
 </div>
 
+<!-- السلة -->
 <div id="cart" class="section" style="display:none">
     <button class="back" onclick="showSection('main')">⬅ رجوع</button>
+
     <h3>السلة</h3>
     <ul id="cartItems"></ul>
     <p id="total"></p>
+
     <button onclick="checkout()">شراء</button>
 </div>
 
@@ -105,30 +153,31 @@ button {
 let cart = [];
 
 function showSection(id) {
-    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     document.getElementById(id).style.display = 'block';
 }
 
 function addToCart(name, price) {
     cart.push({name, price});
-    alert('تمت الإضافة للسلة');
+    alert("تمت الإضافة للسلة");
 }
 
 function checkout() {
-    let list = document.getElementById('cartItems');
+    let list = document.getElementById("cartItems");
     let total = 0;
-    list.innerHTML = '';
+    list.innerHTML = "";
 
     cart.forEach(item => {
-        let li = document.createElement('li');
-        li.textContent = item.name + ' - ' + item.price + ' دينار';
+        let li = document.createElement("li");
+        li.textContent = item.name + " - " + item.price + " دينار";
         list.appendChild(li);
         total += item.price;
     });
 
-    document.getElementById('total').textContent = 'المجموع: ' + total + ' دينار';
+    document.getElementById("total").textContent = "المجموع: " + total + " دينار";
 
-    alert('تم الشراء! تواصل معنا على واتساب: 38055385');
+    alert("تم الشراء! تواصل معنا على واتساب: 38055385");
+
     cart = [];
 }
 </script>
